@@ -1,4 +1,4 @@
-package com.example.warehouse;
+package com.example.warehouse.modelLayer;
 
 public class Product {
     private int id;

@@ -1,12 +1,11 @@
-package com.example.warehouse;
-
+package com.example.warehouse.presentationLayer;
 
 import java.io.File;
 import java.net.URL;
-
-import java.sql.Connection;
-import java.sql.Statement;
 import java.util.ResourceBundle;
+
+import com.example.warehouse.databaseLayer.ClientDataBase;
+import com.example.warehouse.modelLayer.ClientModel;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,7 +18,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-
 public class Deleteclient implements Initializable {
 
     @FXML
@@ -27,40 +25,31 @@ public class Deleteclient implements Initializable {
     @FXML
     private TextField nTextField;
     @FXML
-    private TextField ppTextField;
+    private TextField pTextField;
     @FXML
     private TextField deleteButton;
+
+    private ClientDataBase clientDataBase;
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
         File file = new File("sad/sad.jpg");
         Image image = new Image(file.toURI().toString());
         this.sadImageView.setImage(image);
+        this.clientDataBase = new ClientDataBase();
     }
 
     public void deletedButtonOnAction(ActionEvent actionEvent) {
-        this.deleteUser();
+        String username = nTextField.getText();
+        String password = pTextField.getText();
+        ClientModel clientToDelete = new ClientModel(username, password);
+        clientDataBase.deleteUser(clientToDelete);
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("/com/example/warehouse/hello-view.fxml"));
-            Scene scene = new Scene((Parent)fxmlLoader.load(), 599.0, 398.0);
-            Stage stage = new Stage();
-            stage.setTitle("Hello!");
-            stage.setScene(scene);
-            stage.show();
-        } catch (Exception var4) {
-            var4.printStackTrace();
-            var4.getCause();
-        }
-    }
-
-    public void deleteUser(){
-        DatabaseConnection connectNow = new DatabaseConnection();
-        Connection connectDB = connectNow.getConnection();
-        String username = this.nTextField.getText();
-        String deleteQuery = "DELETE FROM info WHERE name = '" + username + "'";
-
-        try {
-            Statement statement = connectDB.createStatement();
-            statement.executeUpdate(deleteQuery);
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/warehouse/hello-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 611.0, 388.0);
+            Stage newStage = new Stage();
+            newStage.setTitle("Admin Page");
+            newStage.setScene(scene);
+            newStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }

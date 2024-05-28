@@ -1,4 +1,4 @@
-package com.example.warehouse;
+package com.example.warehouse.presentationLayer;
 
 import java.io.File;
 import java.net.URL;
@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import com.example.warehouse.databaseLayer.DatabaseConnection;
+import com.example.warehouse.modelLayer.Product;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -49,25 +51,38 @@ public class Clientspage implements Initializable {
     private TableColumn<Product, String> productNameColumn;
     @FXML
     private TableColumn<Product, Integer> productStockColumn;
-
     private String loggedInUsername;
-
     private ObservableList<Product> productList;
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         File file = new File("Pages/buy.jpg");
         Image image = new Image(file.toURI().toString());
         this.clientsImageView.setImage(image);
-
         productIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         productNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         productStockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
-
         productList = FXCollections.observableArrayList();
         productsTableView.setItems(productList);
-
         loadProducts();
+    }
+    private void loadProducts() {
+        DatabaseConnection connectNow = new DatabaseConnection();
+        Connection connectDB = connectNow.getConnection();
+        String query = "SELECT id, productname, stock FROM products";
+        try {
+            PreparedStatement preparedStatement = connectDB.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            productList.clear();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("productname");
+                int stock = resultSet.getInt("stock");
+                Product product = new Product(id, name, stock);
+                productList.add(product);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setLoggedInUsername(String username) {
@@ -188,7 +203,6 @@ public class Clientspage implements Initializable {
 
     private void insertOrder(Connection connectDB, int userId, int productId, int quantity) {
         String insertOrderQuery = "INSERT INTO orders (user_id, product_id, quantity) VALUES (?, ?, ?)";
-
         try {
             PreparedStatement preparedStatement = connectDB.prepareStatement(insertOrderQuery);
             preparedStatement.setInt(1, userId);
@@ -217,28 +231,5 @@ public class Clientspage implements Initializable {
         }
         return user_id;
     }
-
-    private void loadProducts() {
-        DatabaseConnection connectNow = new DatabaseConnection();
-        Connection connectDB = connectNow.getConnection();
-
-        String query = "SELECT id, productname, stock FROM products";
-
-        try {
-            PreparedStatement preparedStatement = connectDB.prepareStatement(query);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            productList.clear();
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("productname");
-                int stock = resultSet.getInt("stock");
-
-                Product product = new Product(id, name, stock);
-                productList.add(product);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }
+
