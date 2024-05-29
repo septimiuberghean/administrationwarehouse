@@ -1,3 +1,6 @@
+/**
+ * The Clientspage class controls the UI for the client dashboard.
+ */
 package com.example.warehouse.presentationLayer;
 
 import java.io.File;
@@ -8,8 +11,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+import com.example.warehouse.businesslogicLayer.OrderBusiness;
 import com.example.warehouse.databaseLayer.DatabaseConnection;
 import com.example.warehouse.modelLayer.Product;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -51,8 +56,17 @@ public class Clientspage implements Initializable {
     private TableColumn<Product, String> productNameColumn;
     @FXML
     private TableColumn<Product, Integer> productStockColumn;
+
     private String loggedInUsername;
     private ObservableList<Product> productList;
+    private OrderBusiness orderBusiness;
+
+    /**
+     * Initializes the controller.
+     *
+     * @param url            The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param resourceBundle The resources used to localize the root object, or null if the root object was not localized.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         File file = new File("Pages/buy.jpg");
@@ -64,7 +78,12 @@ public class Clientspage implements Initializable {
         productList = FXCollections.observableArrayList();
         productsTableView.setItems(productList);
         loadProducts();
+        orderBusiness = new OrderBusiness();
     }
+
+    /**
+     * Loads the products into the TableView.
+     */
     private void loadProducts() {
         DatabaseConnection connectNow = new DatabaseConnection();
         Connection connectDB = connectNow.getConnection();
@@ -85,10 +104,20 @@ public class Clientspage implements Initializable {
         }
     }
 
+    /**
+     * Sets the username of the logged-in user.
+     *
+     * @param username The username of the logged-in user.
+     */
     public void setLoggedInUsername(String username) {
         this.loggedInUsername = username;
     }
 
+    /**
+     * Handles the action when the delete button is clicked.
+     *
+     * @param actionEvent The action event.
+     */
     @FXML
     public void deleteButtonOnAction(ActionEvent actionEvent) {
         try {
@@ -98,12 +127,16 @@ public class Clientspage implements Initializable {
             stage.setTitle("Hello!");
             stage.setScene(scene);
             stage.show();
-        } catch (Exception var4) {
-            var4.printStackTrace();
-            var4.getCause();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Handles the action when the update button is clicked.
+     *
+     * @param actionEvent The action event.
+     */
     @FXML
     public void updateButtonOnAction(ActionEvent actionEvent) {
         try {
@@ -113,123 +146,23 @@ public class Clientspage implements Initializable {
             stage.setTitle("Hello!");
             stage.setScene(scene);
             stage.show();
-        } catch (Exception var4) {
-            var4.printStackTrace();
-            var4.getCause();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Handles the action when the order button is clicked.
+     *
+     * @param actionEvent The action event.
+     */
     @FXML
     public void orderButtonOnAction(ActionEvent actionEvent) {
         if (!this.selectproductTextField.getText().isBlank() && !this.selectquantityTextField.getText().isBlank()) {
-            placeOrder();
+            String productName = selectproductTextField.getText();
+            int quantity = Integer.parseInt(selectquantityTextField.getText());
+            orderBusiness.placeOrder(productName, quantity, loggedInUsername);
+            loadProducts();
         }
-    }
-
-    private void placeOrder() {
-        DatabaseConnection connectNow = new DatabaseConnection();
-        Connection connectDB = connectNow.getConnection();
-
-        String productName = selectproductTextField.getText();
-        String quantityString = selectquantityTextField.getText();
-        int quantity = Integer.parseInt(quantityString);
-
-        int productId = getProductId(productName);
-        int user_id = this.getUserIdByUsername(connectDB, this.loggedInUsername);
-        insertOrder(connectDB, user_id, productId, quantity);
-        updateStock(productName, quantity);
-    }
-
-    private void updateStock(String productName, int quantity) {
-        DatabaseConnection connectNow = new DatabaseConnection();
-        Connection connectDB = connectNow.getConnection();
-
-        int currentStock = getCurrentStock(connectDB, productName);
-        int updatedStock = currentStock - quantity;
-
-        if (updatedStock >= 0) {
-            String updateQuery = "UPDATE products SET stock = ? WHERE productname = ?";
-
-            try {
-                PreparedStatement preparedStatement = connectDB.prepareStatement(updateQuery);
-                preparedStatement.setInt(1, updatedStock);
-                preparedStatement.setString(2, productName);
-
-                preparedStatement.executeUpdate();
-                System.out.println("Stock updated successfully.");
-                loadProducts();  // Reload products to refresh the table
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Insufficient stock.");
-        }
-    }
-
-    private int getCurrentStock(Connection connectDB, String productName) {
-        String query = "SELECT stock FROM products WHERE productname = ?";
-        int currentStock = -1;
-
-        try {
-            PreparedStatement preparedStatement = connectDB.prepareStatement(query);
-            preparedStatement.setString(1, productName);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                currentStock = resultSet.getInt("stock");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return currentStock;
-    }
-
-    private int getProductId(String productName) {
-        DatabaseConnection connectNow = new DatabaseConnection();
-        Connection connectDB = connectNow.getConnection();
-
-        String query = "SELECT id FROM products WHERE productname = ?";
-        try {
-            PreparedStatement preparedStatement = connectDB.prepareStatement(query);
-            preparedStatement.setString(1, productName);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("id");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
-    private void insertOrder(Connection connectDB, int userId, int productId, int quantity) {
-        String insertOrderQuery = "INSERT INTO orders (user_id, product_id, quantity) VALUES (?, ?, ?)";
-        try {
-            PreparedStatement preparedStatement = connectDB.prepareStatement(insertOrderQuery);
-            preparedStatement.setInt(1, userId);
-            preparedStatement.setInt(2, productId);
-            preparedStatement.setInt(3, quantity);
-
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private int getUserIdByUsername(Connection connectDB, String username) {
-        String selectQuery = "SELECT id FROM info WHERE name = ?";
-        int user_id = -1;
-
-        try {
-            PreparedStatement preparedStatement = connectDB.prepareStatement(selectQuery);
-            preparedStatement.setString(1, username);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                user_id = resultSet.getInt("id");
-            }
-        } catch (Exception var7) {
-            var7.printStackTrace();
-        }
-        return user_id;
     }
 }
-

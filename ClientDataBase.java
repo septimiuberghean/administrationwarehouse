@@ -1,3 +1,6 @@
+/**
+ * The ClientDataBase class provides methods to interact with the client information stored in the database.
+ */
 package com.example.warehouse.databaseLayer;
 
 import com.example.warehouse.businesslogicLayer.ClientBusiness;
@@ -9,10 +12,18 @@ public class ClientDataBase {
 
     private ClientBusiness clientBusiness;
 
+    /**
+     * Constructs a new ClientDataBase object.
+     */
     public ClientDataBase() {
         this.clientBusiness = new ClientBusiness();
     }
 
+    /**
+     * Registers a new user in the database.
+     *
+     * @param clientModel The ClientModel object containing the user information to be registered.
+     */
     public void registerUser(ClientModel clientModel) {
         DatabaseConnection connectNow = new DatabaseConnection();
         Connection connectDB = connectNow.getConnection();
@@ -32,6 +43,11 @@ public class ClientDataBase {
         }
     }
 
+    /**
+     * Deletes a user from the database.
+     *
+     * @param clientModel The ClientModel object containing the user information to be deleted.
+     */
     public void deleteUser(ClientModel clientModel) {
         DatabaseConnection connectNow = new DatabaseConnection();
         Connection connectDB = connectNow.getConnection();
@@ -46,6 +62,12 @@ public class ClientDataBase {
         }
     }
 
+    /**
+     * Updates a user's information in the database.
+     *
+     * @param oldUsername       The old username of the user to be updated.
+     * @param updatedClientModel The updated ClientModel object containing the new user information.
+     */
     public void updateUser(String oldUsername, ClientModel updatedClientModel) {
         DatabaseConnection connectNow = new DatabaseConnection();
         Connection connectDB = connectNow.getConnection();

@@ -1,3 +1,6 @@
+/**
+ * The Addproduct class controls the UI for adding a new product.
+ */
 package com.example.warehouse.presentationLayer;
 
 import java.io.File;
@@ -17,6 +20,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 public class Addproduct implements Initializable {
+
     @FXML
     private ImageView addproductImageView;
     @FXML
@@ -28,6 +32,13 @@ public class Addproduct implements Initializable {
 
     private ProductDataBase productDataBase;
     private ProductModel productModel;
+
+    /**
+     * Initializes the controller.
+     *
+     * @param url            The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param resourceBundle The resources used to localize the root object, or null if the root object was not localized.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         File file = new File("products/addproduct.jpg");
@@ -36,6 +47,12 @@ public class Addproduct implements Initializable {
         this.productDataBase = new ProductDataBase();
         this.productModel = new ProductModel();
     }
+
+    /**
+     * Handles the action when the add product button is clicked.
+     *
+     * @param actionEvent The action event.
+     */
     @FXML
     public void addpButtonOnAction(ActionEvent actionEvent) {
         productModel.setProductName(npTextField.getText());

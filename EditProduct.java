@@ -1,3 +1,6 @@
+/**
+ * The EditProduct class controls the UI for editing product details.
+ */
 package com.example.warehouse.presentationLayer;
 
 import java.io.File;
@@ -32,6 +35,12 @@ public class EditProduct implements Initializable {
     private ProductDataBase productDataBase;
     private ProductModel productModel;
 
+    /**
+     * Initializes the controller.
+     *
+     * @param url            The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param resourceBundle The resources used to localize the root object, or null if the root object was not localized.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         File file = new File("products/editproduct.jpg");
@@ -41,6 +50,11 @@ public class EditProduct implements Initializable {
         this.productModel = new ProductModel();
     }
 
+    /**
+     * Handles the action when the restock button is clicked.
+     *
+     * @param actionEvent The action event.
+     */
     @FXML
     public void restockButtonOnAction(ActionEvent actionEvent) {
         productModel.setProductName(selectTextField.getText());

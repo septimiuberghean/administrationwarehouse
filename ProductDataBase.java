@@ -1,11 +1,19 @@
+/**
+ * The ProductDataBase class provides methods to interact with the products stored in the database.
+ */
 package com.example.warehouse.databaseLayer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-
 import com.example.warehouse.modelLayer.ProductModel;
 
 public class ProductDataBase {
+
+    /**
+     * Adds a new product to the database.
+     *
+     * @param productModel The ProductModel object representing the product to be added.
+     */
     public void addProduct(ProductModel productModel) {
         DatabaseConnection connectNow = new DatabaseConnection();
         Connection connectDB = connectNow.getConnection();
@@ -21,6 +29,11 @@ public class ProductDataBase {
         }
     }
 
+    /**
+     * Deletes a product from the database.
+     *
+     * @param productModel The ProductModel object representing the product to be deleted.
+     */
     public void deleteProduct(ProductModel productModel) {
         DatabaseConnection connectNow = new DatabaseConnection();
         Connection connectDB = connectNow.getConnection();
@@ -35,6 +48,11 @@ public class ProductDataBase {
         }
     }
 
+    /**
+     * Updates the stock of a product in the database.
+     *
+     * @param productModel The ProductModel object representing the product whose stock is to be updated.
+     */
     public void updateStock(ProductModel productModel) {
         DatabaseConnection connectNow = new DatabaseConnection();
         Connection connectDB = connectNow.getConnection();
